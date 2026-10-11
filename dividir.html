@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divisor Inteligente de Textos para Voz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .input-section {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .input-header label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-limite {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .config-limite input {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: #38bdf8;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 13px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            border-color: #38bdf8;
+        }
+
+        .btn-dividir {
+            width: 100%;
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-dividir:hover {
+            background: rgba(56, 189, 248, 0.35);
+            border-color: #38bdf8;
+            color: #fff;
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .chunk-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chunk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chunk-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #38bdf8;
+        }
+
+        .chunk-info {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .chunk-content {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 12px;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .btn-copiar {
+            align-self: flex-end;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #4ade80;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-copiar:hover {
+            background: rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-copiar.copiado {
+            background: rgba(34, 197, 94, 0.3);
+            color: #fff;
+            border-color: #4ade80;
+        }
+
+        .contador-total {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 5px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>🎙️ Divisor Inteligente de Textos</h1>
+        <p>Divida textos longos respeitando o limite de caracteres e as pontuações das frases.</p>
+    </header>
+
+    <div class="input-section">
+        <div class="input-header">
+            <label for="textoGrande">Cole seu texto grande aqui:</label>
+            <div class="config-limite">
+                <span>Limite por bloco:</span>
+                <input type="number" id="limiteCaracteres" value="1000" min="100" max="5000" oninput="atualizarContador()">
+            </div>
+        </div>
+        <textarea id="textoGrande" placeholder="Cole seu texto completo (mais de 15k caracteres)..." oninput="atualizarContador()"></textarea>
+        <div class="contador-total" id="contadorTotal">0 caracteres</div>
+        <button class="btn-dividir" onclick="processarDivisao()">Dividir Texto Inteligente</button>
+    </div>
+
+    <div class="results-section" id="resultadosContainer">
+        <!-- Os blocos divididos aparecerão aqui -->
+    </div>
+</div>
+
+<script>
+    function atualizarContador() {
+        const texto = document.getElementById('textoGrande').value;
+        document.getElementById('contadorTotal').innerText = `${texto.length.toLocaleString('pt-BR')} caracteres`;
+    }
+
+    function processarDivisao() {
+        const texto = document.getElementById('textoGrande').value;
+        const limite = parseInt(document.getElementById('limiteCaracteres').value) || 1000;
+        const container = document.getElementById('resultadosContainer');
+        
+        container.innerHTML = '';
+
+        if (!texto.trim()) {
+            alert('Por favor, insira um texto para dividir.');
+            return;
+        }
+
+        let partes = dividirTextoInteligente(texto, limite);
+
+        partes.forEach((parte, index) => {
+            const card = document.createElement('div');
+            card.className = 'chunk-card';
+            
+            card.innerHTML = `
+                <div class="chunk-header">
+                    <span class="chunk-title">Parte ${index + 1} de ${partes.length}</span>
+                    <span class="chunk-info">${parte.length} caracteres</span>
+                </div>
+                <div class="chunk-content">${escapeHtml(parte)}</div>
+                <button class="btn-copiar" onclick="copiarTextoBloco(this, \`${escapeJs(parte)}\`)">Copiar Parte ${index + 1}</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function dividirTextoInteligente(texto, limite) {
+        let partes = [];
+        let resto = texto.trim();
+
+        while (resto.length > 0) {
+            if (resto.length <= limite) {
+                partes.push(resto);
+                break;
+            }
+
+            // Pega o trecho até o limite estipulado
+            let sub = resto.substring(0, limite);
+            let indiceCorte = -1;
+
+            // 1. Tenta achar uma pontuação forte (. ! ?) de trás para frente no bloco
+            for (let i = sub.length - 1; i >= 0; i--) {
+                if (['.', '!', '?', '\n'].includes(sub[i])) {
+                    indiceCorte = i + 1; // inclui a pontuação no bloco atual
+                    break;
+                }
+            }
+
+            // 2. Se não achou pontuação forte ou o corte for muito curto (menos de 50% do limite), tenta vírgula ou espaço
+            if (indiceCorte === -1 || indiceCorte < limite * 0.4) {
+                for (let i = sub.length - 1; i >= 0; i--) {
+                    if ([',', ';', ':', ' '].includes(sub[i])) {
+                        indiceCorte = i + 1;
+                        break;
+                    }
+                }
+            }
+
+            // 3. Se ainda não achou nada (palavra gigante), corta no limite seco
+            if (indiceCorte === -1 || indiceCorte === 0) {
+                indiceCorte = limite;
+            }
+
+            let parteAtual = resto.substring(0, indiceCorte).trim();
+            partes.push(parteAtual);
+            resto = resto.substring(indiceCorte).trim();
+        }
+
+        return partes;
+    }
+
+    function copiarTextoBloco(btnEl, texto) {
+        navigator.clipboard.writeText(texto).then(() => {
+            const originalText = btnEl.innerText;
+            btnEl.innerText = 'Copiado!';
+            btnEl.classList.add('copiado');
+            setTimeout(() => {
+                btnEl.innerText = originalText;
+                btnEl.classList.remove('copiado');
+            }, 2000);
+        }).catch(err => {
+            alert('Erro ao copiar.');
+        });
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(0, "&#039;");
+    }
+
+    function escapeJs(text) {
+        return text.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+    }
+</script>
+
+</body>
+</html>
